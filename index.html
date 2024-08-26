@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notcoin Clone</title>
+    <style>
+        /* Ваш CSS тут */
+    </style>
+</head>
+<body>
+    <div class="game-container" id="game-screen">
+        <!-- Інтерфейс гри -->
+    </div>
+
+    <script type="module">
+        // Імпорт Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+        // Ваш конфігураційний код Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-5CPzp5iwNHUxloFkDBf3J8gRlUpbGVc",
+            authDomain: "ton-not.firebaseapp.com",
+            databaseURL: "https://ton-not-default-rtdb.firebaseio.com",
+            projectId: "ton-not",
+            storageBucket: "ton-not.appspot.com",
+            messagingSenderId: "729333286761",
+            appId: "1:729333286761:web:741fdeb1572cc1908bdff8",
+            measurementId: "G-JKCWNWTLBT"
+        };
+
+        // Ініціалізація Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Отримання даних користувача Telegram
+        const telegram = window.Telegram.WebApp;
+        const userId = telegram.initDataUnsafe.user.id; // Отримання унікального ID користувача
+
+        // Змінні гри
+        let balance = 2500;
+        let energy = 1000;
+        let maxEnergy = 1000;
+        let upgradeLevel = 0;
+        let rechargeLevel = 0;
+        let tapLevel = 0;
+        let energyRechargeRate = 1;
+        let tapMultiplier = 1;
+        let baseCost = 500;
+
+        // Функція для збереження даних у Firebase
+        function saveDataToFirebase() {
+            const userRef = ref(db, 'users/' + userId);
+            set(userRef, {
+                balance: balance,
+                energy: energy,
+                maxEnergy: maxEnergy,
+                upgradeLevel: upgradeLevel,
+                rechargeLevel: rechargeLevel,
+                tapLevel: tapLevel,
+                energyRechargeRate: energyRechargeRate,
+                tapMultiplier: tapMultiplier
+            });
+        }
+
+        // Функція для завантаження даних із Firebase
+        function loadDataFromFirebase() {
+            const userRef = ref(db, 'users/' + userId);
+
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    balance = data.balance || 2500;
+                    energy = data.energy || 1000;
+                    maxEnergy = data.maxEnergy || 1000;
+                    upgradeLevel = data.upgradeLevel || 0;
+                    rechargeLevel = data.rechargeLevel || 0;
+                    tapLevel = data.tapLevel || 0;
+                    energyRechargeRate = data.energyRechargeRate || 1;
+                    tapMultiplier = data.tapMultiplier || 1;
+                }
+                updateDisplay();
+            });
+        }
+
+        // Функція для оновлення інтерфейсу
+        function updateDisplay() {
+            document.querySelector('.balance').innerText = balance.toLocaleString();
+            document.querySelector('.energy').innerText = `⚡ ${energy} / ${maxEnergy}`;
+            document.querySelector('.progress').style.width = `${(energy / maxEnergy) * 100}%`;
+        }
+
+        // Ініціалізація гри
+        window.onload = () => {
+            loadDataFromFirebase(); // Завантаження даних при старті
+        };
+
+        // Події гри та інші функції
+        // Наприклад, обробка кліків по монеті або покупка бустів
+        
+    </script>
+</body>
+</html>
